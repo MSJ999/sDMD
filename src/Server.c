@@ -32,6 +32,7 @@ void swap(struct REMDTempStr *x, struct REMDTempStr *y);
 void distribute(int *sockets, struct REMDTempStr *T, int number_of_connects);
 int open_connections(int *sockets, int connects_wanted, int port_number, int timeout);
 int close_connections(int *sockets, int connections_open);
+int CheckEnd(struct REMDTempStr *T, int number_of_connects);
 
 
 /*
@@ -104,7 +105,7 @@ void server(int *sockets, int number_of_connects) {
 	}
 
 	collect(sockets, Epot, T, number_of_connects);
-	while (T[0].T != 0.0) {
+	while (!CheckEnd(T, number_of_connects)) {
 		rearrange(Epot, T, number_of_connects);
 		distribute(sockets, T, number_of_connects);
 		collect(sockets, Epot, T, number_of_connects);
@@ -264,4 +265,13 @@ int close_connections(int *sockets, int connections_open) {
     for (i = 0; i < connections_open; i++)
         connects_closed += !close(sockets[i]);
     return connects_closed = connections_open;
+}
+
+int CheckEnd(struct REMDTempStr *T, int number_of_connects) {
+    
+    for (int i = 0; i < number_of_connects; i ++) {
+        if (!T[i].T) return 1; //if any temperature had been 0
+    }
+    
+    return 0;
 }
